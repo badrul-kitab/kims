@@ -57,16 +57,16 @@ if (isset($_POST['submit'])) {
         kod_progstruk LIKE '%$kodprog%'
     ORDER BY
 	    sem ASC;");
-
 }
 
+// if (isset($_POST['Tawar'])) {
 // todo: Array problem somewhere, need to check
 $selectedKodKurusArr = $_POST['tawar_checkbox_kod_kursus'];
 if (!empty($selectedKodKurusArr)) {
     // Iterate through selected kod kursus (checkboxes) from the query and execute the statement for each course
     for ($i = 0; $i < count($selectedKodKurusArr); $i++) {
         $kod_kursus = $selectedKodKurusArr[$i];
-        $selectedKodSesi = $_POST['kodsesi'];
+        //$selectedKodSesi = $_POST['selectedKodSesi'];
         $kodprog = $_POST['kodprog'];
 
         if ($kodprog == "DKS1") {
@@ -92,10 +92,13 @@ if (!empty($selectedKodKurusArr)) {
         } elseif ($kodprog == "SU1") {
             $kod_prog = "SU";
         }
+
+        print_r($selectedKodSesi);
+        die();
         // Prepare the SQL statement template to update pel_kursus
         $sqlTemplate = "INSERT INTO kur_tawar (sesi_sem,kodkursus,kod_prog,est_bilpel,twr_on,user_add,dt_add,user_upd,dt_upd) VALUES ('$selectedKodSesi','$kod_kursus','$kod_prog',0,1,'sysAdm',CURRENT_TIMESTAMP,NULL,NULL)";
 
-        // Prepare the statement
+        //Prepare the statement
         if ($stmt = mysqli_prepare($link, $sqlTemplate)) {
             // Attempt to execute the prepared statement
             if (mysqli_stmt_execute($stmt)) {
@@ -106,6 +109,7 @@ if (!empty($selectedKodKurusArr)) {
             }
         }
     }
+
     // // Close statement
     mysqli_stmt_close($stmt);
 
@@ -117,6 +121,8 @@ if (!empty($selectedKodKurusArr)) {
 } else {
     echo "No checkboxes were selected.";
 }
+
+
 
 
 ?>
@@ -343,62 +349,61 @@ if (!empty($selectedKodKurusArr)) {
                                     </div>
 
                                     <input class="btn btn-primary" type="submit" name="submit">
-                                    <?php
-                                    $bil = 1;
-                                    $total_kredit = 0;
-                                    
-
-                                    if (isset($kursusList) && $kursusList->num_rows > 0) : ?>
-                                        </br>
-                                        </br>
-                                        <input style="margin: 5px;" type="checkbox" onclick="toggle(this);" />Pilih Semua<br />
-                                        <table class="table" id="myTable">
-                                            <thead>
-                                                <tr>
-                                                    <th> &nbsp; </th>
-                                                    <th scope="col">#</th>
-                                                    <th scope="col">Kod Kursus</th>
-                                                    <th scope="col">Nama Kursus</th>
-                                                    <th scope="col">Struktur Program</th>
-                                                    <th scope="col">Semester</th>
-                                                    <th scope="col">Kredit</th>
-                                                    <th scope="col">Edit</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <?php while ($kursus = $kursusList->fetch_assoc()) :
-                                                    $kod_progstruk = $kursus['kod_progstruk'];
-                                                ?>
+                                </form>
+                                <div class="card-body">
+                                    <form action="" method="post">
+                                        <?php
+                                        $bil = 1;
+                                        $total_kredit = 0;
+                                        if (isset($kursusList) && $kursusList->num_rows > 0) : ?>
+                                            <input style="margin: 5px;" type="checkbox" onclick="toggle(this);" />Pilih Semua<br />
+                                            <table class="table" id="myTable">
+                                                <thead>
                                                     <tr>
-                                                        <td>
-                                                            <input type="checkbox" name="tawar_checkbox_kod_kursus[]" value="<?= $kursus['kodkursus']; ?>">
-                                                        </td>
-                                                        <td scope="col"><?= $bil++; ?></td>
-                                                        <td scope="col"><?= $kursus['kodkursus']; ?></td>
-                                                        <td scope="col"><?= $kursus['namakur_MY']; ?></td>
-                                                        <td scope="col"><?= $kod_progstruk; ?></td>
-                                                        <td scope="col"><?= $kursus['sem']; ?></td>
-                                                        <td scope="col"><?= $kursus['kredit']; ?></td>
-                                                        <!-- todo: pass value link ke next page -->
-                                                        <td scope="col"><button class="btn btn-primary" href="test.php">Edit</button>
+                                                        <th> &nbsp; </th>
+                                                        <th scope="col">#</th>
+                                                        <th scope="col">Kod Kursus</th>
+                                                        <th scope="col">Nama Kursus</th>
+                                                        <th scope="col">Struktur Program</th>
+                                                        <th scope="col">Semester</th>
+                                                        <th scope="col">Kredit</th>
+                                                        <th scope="col">Edit</th>
                                                     </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php while ($kursus = $kursusList->fetch_assoc()) :
+                                                        $kod_progstruk = $kursus['kod_progstruk'];
+                                                    ?>
+                                                        <tr>
+                                                            <td>
+                                                                <input type="checkbox" name="tawar_checkbox_kod_kursus[]" value="<?= $kursus['kodkursus']; ?>">
+                                                            </td>
+                                                            <td scope="col"><?= $bil++; ?></td>
+                                                            <td scope="col"><?= $kursus['kodkursus']; ?></td>
+                                                            <td scope="col"><?= $kursus['namakur_MY']; ?></td>
+                                                            <td scope="col"><?= $kod_progstruk; ?></td>
+                                                            <td scope="col"><?= $kursus['sem']; ?></td>
+                                                            <td scope="col"><?= $kursus['kredit']; ?></td>
+                                                            <!-- todo: pass value link ke next page -->
+                                                            <td scope="col"><button class="btn btn-primary" href="test.php">Edit</button>
+                                                        </tr>
 
-                                                <?php
-                                                // $total_kredit += (int)$student['kredit'];
-                                                endwhile; ?>
-                                            </tbody>
-                                        </table>
+                                                    <?php
+                                                    // $total_kredit += (int)$student['kredit'];
+                                                    endwhile; ?>
+                                                </tbody>
+                                            </table>
 
-                                        <!-- Button to update kodstatus_pel -->
-                                        <form action="" method="post">
+                                            <!-- Button to update kodstatus_pel -->
                                             <input class="btn btn-primary" type="submit" value="Tawar">
                                             <input type="hidden" name="selectedProgram" value="<?= $selectedProgram ?>">
                                             <input type="hidden" name="selectedKodSesi" value="<?= $selectedKodSesi ?>">
                                             <input type="hidden" name="kodprog" value="<?= $kod_progstruk ?>">
-                                        </form>
 
-                                    <?php endif; ?>
-                                </form>
+
+                                        <?php endif; ?>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>
